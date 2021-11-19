@@ -1,0 +1,820 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.57.1 74a55df1",
+  "osm3s": {
+    "timestamp_osm_base": "2021-11-19T04:13:10Z",
+    "timestamp_areas_base": "2021-11-19T04:06:09Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+    {
+      "type": "node",
+      "id": 304154313,
+      "lat": 53.5594408,
+      "lon": -113.55378,
+      "tags": {
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "operator": "Canada Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 304464980,
+      "lat": 53.598328,
+      "lon": -113.4904964,
+      "tags": {
+        "created_by": "Potlatch 0.10e",
+        "name": "Northgate Safeway",
+        "operator": "Canada Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 317119385,
+      "lat": 53.5473417,
+      "lon": -113.518122,
+      "tags": {
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "operator": "Canada Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 317126578,
+      "lat": 53.552423,
+      "lon": -113.4888053,
+      "tags": {
+        "created_by": "Potlatch 0.10f",
+        "name": "Lucky 97 Market",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 601754732,
+      "lat": 53.5155016,
+      "lon": -113.4959778,
+      "tags": {
+        "name": "Planet Organic",
+        "organic": "yes",
+        "shop": "supermarket",
+        "url": "http://planetorganic.ca/locations/planet-organic-edmonton-south/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 632192123,
+      "lat": 53.5424227,
+      "lon": -113.5089631,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "10180",
+        "addr:postcode": "T5J 5B4",
+        "addr:street": "109 Street NW",
+        "brand": "Save-On-Foods",
+        "brand:wikidata": "Q7427974",
+        "brand:wikipedia": "en:Save-On-Foods",
+        "name": "Save-On-Foods",
+        "shop": "supermarket",
+        "website": "https://www.saveonfoods.com/store/9th-jasper/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 636796994,
+      "lat": 53.5764333,
+      "lon": -113.4666876,
+      "tags": {
+        "name": "Cliff's IGA",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 638183189,
+      "lat": 53.5234995,
+      "lon": -113.6239772,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "8882",
+        "addr:postcode": "T5T 4J2",
+        "addr:province": "AB",
+        "addr:street": "170 Street NW",
+        "addr:unit": "2580",
+        "brand": "T&T Supermarket",
+        "brand:website": "https://www.tntsupermarket.com",
+        "brand:wikidata": "Q837893",
+        "brand:wikipedia": "en:T & T Supermarket",
+        "layer": "2",
+        "name": "T&T Supermarket",
+        "opening_hours": "Mo-Sa 09:00-21:30; Su 09:00-21:00",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 660100085,
+      "lat": 53.4527279,
+      "lon": -113.5645172,
+      "tags": {
+        "name": "Save On Foods",
+        "operator": "Save On Foods",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 705692681,
+      "lat": 53.4256634,
+      "lon": -113.5194452,
+      "tags": {
+        "name": "Save on Foods",
+        "operator": "Save On Foods",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 763957369,
+      "lat": 53.5452409,
+      "lon": -113.4798317,
+      "tags": {
+        "name": "United Grocers",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 764881590,
+      "lat": 53.4950122,
+      "lon": -113.5178446,
+      "tags": {
+        "name": "Sunterra Marketplace",
+        "shop": "supermarket",
+        "url": "http://www.sunterramarket.com/st_DocLib/00C/lendrum.htm"
+      }
+    },
+    {
+      "type": "node",
+      "id": 766248734,
+      "lat": 53.5650478,
+      "lon": -113.5356151,
+      "tags": {
+        "name": "Yanta Food Market",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 766248735,
+      "lat": 53.5640793,
+      "lon": -113.4868204,
+      "tags": {
+        "name": "Arden's Food Varimart",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 818388952,
+      "lat": 53.5146371,
+      "lon": -113.4969999,
+      "tags": {
+        "brand": "Save-On-Foods",
+        "brand:wikidata": "Q7427974",
+        "brand:wikipedia": "en:Save-On-Foods",
+        "name": "Save-On-Foods",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 841414135,
+      "lat": 53.5341833,
+      "lon": -113.5013038,
+      "tags": {
+        "name": "River Valley Food Store",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 860882816,
+      "lat": 53.5209105,
+      "lon": -113.5921175,
+      "tags": {
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 895179781,
+      "lat": 53.4683101,
+      "lon": -113.5884219,
+      "tags": {
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "operator": "Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 906515484,
+      "lat": 53.541285,
+      "lon": -113.5316743,
+      "tags": {
+        "name": "Planet Organic",
+        "shop": "supermarket",
+        "website": "https://planetorganic.ca/ourstores/edmontonnorth"
+      }
+    },
+    {
+      "type": "node",
+      "id": 909037205,
+      "lat": 53.540918,
+      "lon": -113.5872832,
+      "tags": {
+        "name": "Clock IGA",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 909037224,
+      "lat": 53.5395791,
+      "lon": -113.580685,
+      "tags": {
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 909093607,
+      "lat": 53.5257178,
+      "lon": -113.5666948,
+      "tags": {
+        "brand": "IGA",
+        "brand:wikidata": "Q3146662",
+        "brand:wikipedia": "en:IGA (supermarkets)",
+        "name": "IGA",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 909346719,
+      "lat": 53.5463713,
+      "lon": -113.4791097,
+      "tags": {
+        "name": "Nan Phung Supermarket",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 919436274,
+      "lat": 53.465733,
+      "lon": -113.4938392,
+      "tags": {
+        "brand": "Save-On-Foods",
+        "brand:wikidata": "Q7427974",
+        "brand:wikipedia": "en:Save-On-Foods",
+        "name": "Save-On-Foods",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 919436283,
+      "lat": 53.4690342,
+      "lon": -113.4945038,
+      "tags": {
+        "addr:housenumber": "3451",
+        "addr:street": "Calgary Trail NW",
+        "brand": "T&T Supermarket",
+        "brand:wikidata": "Q837893",
+        "brand:wikipedia": "en:T & T Supermarket",
+        "name": "T&T Supermarket",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 978165624,
+      "lat": 53.5604237,
+      "lon": -113.4857734,
+      "tags": {
+        "name": "Productos Latinos",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 983576021,
+      "lat": 53.5391123,
+      "lon": -113.4253024,
+      "tags": {
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1073907375,
+      "lat": 53.6015013,
+      "lon": -113.5369166,
+      "tags": {
+        "name": "Real Canadian Superstore",
+        "shop": "supermarket",
+        "website": "https://www.realcanadiansuperstore.ca/LCLOnline/store_details_landing_page.jsp?storeId=860"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1073907377,
+      "lat": 53.601619,
+      "lon": -113.5388596,
+      "tags": {
+        "name": "Lucky Supermarket",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1074409919,
+      "lat": 53.5752655,
+      "lon": -113.5407732,
+      "tags": {
+        "name": "Sherbrooke Grocery",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1074448130,
+      "lat": 53.4683063,
+      "lon": -113.5878159,
+      "tags": {
+        "name": "M&M Meat Shops",
+        "shop": "supermarket",
+        "website": "http://www.mmmeatshops.com/en/storelocator/store_maps.asp?StoreID=140"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1075901057,
+      "lat": 53.5061416,
+      "lon": -113.4885728,
+      "tags": {
+        "name": "Real Canadian Wholesale Club",
+        "shop": "supermarket",
+        "website": "https://www.wholesaleclub.ca/LCLOnline/store_details_landing_page.jsp?storeId=868"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1305156416,
+      "lat": 53.60053,
+      "lon": -113.487712,
+      "tags": {
+        "addr:housenumber": "9450",
+        "addr:street": "137 Avenue North West",
+        "brand": "T&T Supermarket",
+        "brand:wikidata": "Q837893",
+        "brand:wikipedia": "en:T & T Supermarket",
+        "name": "T&T Supermarket",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1305218789,
+      "lat": 53.5503425,
+      "lon": -113.4889299,
+      "tags": {
+        "name": "Nhon Hoa Supermarket Ltd.",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1452534812,
+      "lat": 53.5705156,
+      "lon": -113.482257,
+      "tags": {
+        "name": "Paraiso Tropical Latin Food market",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1460379981,
+      "lat": 53.5190164,
+      "lon": -113.4569876,
+      "tags": {
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1855137011,
+      "lat": 53.5931325,
+      "lon": -113.5376953,
+      "tags": {
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1955869825,
+      "lat": 53.5416802,
+      "lon": -113.4995027,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "10130",
+        "addr:postcode": "T5J 1A7",
+        "addr:province": "AB",
+        "addr:street": "104 Street NW",
+        "name": "Evoolution",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1968580873,
+      "lat": 53.5716365,
+      "lon": -113.3895987,
+      "tags": {
+        "name": "Safeway",
+        "shop": "supermarket",
+        "source": "Abbottsfield Mall"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2120499695,
+      "lat": 53.5500437,
+      "lon": -113.4934387,
+      "tags": {
+        "name": "Omonia Foods Import",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2191924141,
+      "lat": 53.4654048,
+      "lon": -113.4748659,
+      "tags": {
+        "name": "Korean Central Market",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2336778661,
+      "lat": 53.5692048,
+      "lon": -113.3945874,
+      "tags": {
+        "addr:street": "34 Street NW",
+        "brand": "No Frills",
+        "brand:wikidata": "Q3342407",
+        "brand:wikipedia": "en:No Frills (grocery store)",
+        "name": "No Frills",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2378827842,
+      "lat": 53.5124305,
+      "lon": -113.521201,
+      "tags": {
+        "name": "McKernan Foods",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2497882369,
+      "lat": 53.4541577,
+      "lon": -113.4081751,
+      "tags": {
+        "addr:city": "Edmonton",
+        "name": "All India Grocerers",
+        "shop": "supermarket",
+        "shop_1": "Indian Groceries"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2969736098,
+      "lat": 53.6311182,
+      "lon": -113.539115,
+      "tags": {
+        "brand": "Sobeys",
+        "brand:wikidata": "Q1143340",
+        "brand:wikipedia": "en:Sobeys",
+        "name": "Sobeys",
+        "shop": "supermarket",
+        "source": "local_knowledge"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3370277379,
+      "lat": 53.5394609,
+      "lon": -113.4208137,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "5004",
+        "addr:postcode": "T6A 0A1",
+        "addr:street": "98 Avenue NW",
+        "brand": "Walmart",
+        "brand:wikidata": "Q483551",
+        "brand:wikipedia": "en:Walmart",
+        "name": "Walmart Supercenter",
+        "opening_hours": "07:00-23:00",
+        "operator": "Walmart Canada",
+        "phone": "+1-780-466-2002",
+        "shop": "supermarket",
+        "website": "https://www.walmart.ca/en/walmart-capilano-supercentre/3026"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3628186215,
+      "lat": 53.5421228,
+      "lon": -113.5809314,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "10126",
+        "addr:postcode": "T5P 1P1",
+        "addr:street": "150 Street NW",
+        "brand": "No Frills",
+        "brand:wikidata": "Q3342407",
+        "brand:wikipedia": "en:No Frills (grocery store)",
+        "name": "No Frills",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3636138563,
+      "lat": 53.5024046,
+      "lon": -113.6297876,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "6655",
+        "addr:postcode": "T5T 4J5",
+        "addr:street": "178 Street NW",
+        "brand": "Safeway",
+        "brand:wikidata": "Q1508234",
+        "brand:wikipedia": "en:Safeway Inc.",
+        "name": "Safeway",
+        "shop": "supermarket",
+        "toilets:wheelchair": "no",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3823817682,
+      "lat": 53.5255259,
+      "lon": -113.4277167,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "6204",
+        "addr:street": "90 Avenue North-west",
+        "name": "TGP Ottewell",
+        "shop": "supermarket",
+        "website": "http://ottewell.tgp.ca/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3959940194,
+      "lat": 53.5154872,
+      "lon": -113.4998504,
+      "tags": {
+        "brand": "No Frills",
+        "brand:wikidata": "Q3342407",
+        "brand:wikipedia": "en:No Frills (grocery store)",
+        "name": "No Frills",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4552467552,
+      "lat": 53.4870435,
+      "lon": -113.5132066,
+      "tags": {
+        "name": "Safeway",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4552615006,
+      "lat": 53.4645829,
+      "lon": -113.4576829,
+      "tags": {
+        "name": "Alice Produce Garden",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4557635222,
+      "lat": 53.4591975,
+      "lon": -113.4467626,
+      "tags": {
+        "name": "Oriental Food & Video",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5174943968,
+      "lat": 53.4966784,
+      "lon": -113.6217406,
+      "tags": {
+        "name": "Sayah Groceries & Pita Pies Ltd",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5558162581,
+      "lat": 53.5474987,
+      "lon": -113.5294492,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "12060",
+        "addr:postcode": "T5K 0T3",
+        "addr:street": "104 Avenue NW",
+        "addr:unit": "101",
+        "name": "Loblaws City Market",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "operator": "Loblaws",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6040448505,
+      "lat": 53.4529659,
+      "lon": -113.5112956,
+      "tags": {
+        "name": "M & M Meat Shops",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6392047498,
+      "lat": 53.4621182,
+      "lon": -113.5034523,
+      "tags": {
+        "name": "Serengeti Trading Edmonton",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6396197265,
+      "lat": 53.5706709,
+      "lon": -113.4115482,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "4514",
+        "addr:postcode": "T5W 1A9",
+        "addr:street": "118 Ave NW",
+        "name": "India Bazaar",
+        "opening_hours": "Mo-Fr 10:30-19:00; Sa 10:00-19:00; Su 12:00-17:00",
+        "operator": "Shamim Jessa",
+        "phone": "+1-780-471-2504",
+        "shop": "supermarket",
+        "website": "http://indiabaz.com"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7266578516,
+      "lat": 53.5000814,
+      "lon": -113.628318,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "6404",
+        "addr:postcode": "T5T 4J5",
+        "addr:province": "Alberta",
+        "addr:street": "177 Street NW",
+        "name": "The Happy Camel",
+        "shop": "supermarket",
+        "website": "https://www.happycamel.ca/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7521047207,
+      "lat": 53.4754368,
+      "lon": -113.5273267,
+      "tags": {
+        "brand": "No Frills",
+        "brand:wikidata": "Q3342407",
+        "brand:wikipedia": "en:No Frills (grocery store)",
+        "name": "No Frills",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7736294721,
+      "lat": 53.5394543,
+      "lon": -113.6249849,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:postcode": "T5S 1S9",
+        "addr:province": "AB",
+        "addr:street": "100 Avenue NW",
+        "name": "Seafood City",
+        "opening_hours": "Mo-Sa 8:00-22:00; Su 8:00-21:00",
+        "opening_hours:covid19": "open",
+        "payment:cash": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes",
+        "shop": "supermarket",
+        "start_date": "2020-07-18"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7770061196,
+      "lat": 53.5924469,
+      "lon": -113.4813758,
+      "tags": {
+        "addr:city": "Edmonton",
+        "addr:housenumber": "9030",
+        "addr:province": "Alberta",
+        "addr:street": "132 Avenue NW",
+        "name": "Glengarry Food Store",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8792334096,
+      "lat": 53.4272542,
+      "lon": -113.4244785,
+      "tags": {
+        "brand": "Real Canadian Superstore",
+        "brand:wikidata": "Q7300856",
+        "brand:wikipedia": "en:Real Canadian Superstore",
+        "name": "Real Canadian Superstore",
+        "shop": "supermarket"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9027044545,
+      "lat": 53.6300871,
+      "lon": -113.5467398,
+      "tags": {
+        "brand": "Bulk Barn",
+        "brand:wikidata": "Q4996466",
+        "brand:wikipedia": "en:Bulk Barn",
+        "name": "Bulk Barn",
+        "shop": "supermarket"
+      }
+    }
+  ]
+}
