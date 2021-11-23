@@ -5,6 +5,8 @@ from Classes.Route import Route
 import networkx as nx
 import osmnx as ox
 import json
+import math
+import time
 from shapely.geometry import Point
 
 """
@@ -27,9 +29,10 @@ def main():
     # print(route.POIs[0].id)
 
 
-    G = ox.graph_from_place("Edmonton, CA", network_type="drive")
+    #G = ox.graph_from_place("Edmonton, CA", network_type="drive")
     # fig, ax = ox.plot_graph(G)
-    print(type(G))
+    #print(type(G))
+
 
     # print(G.nodes)
     # print("Below is items")
@@ -103,44 +106,160 @@ def main():
     #         f.write("{} {} {} {}\n".format(stores["elements"][i]['id'], stores["elements"][i]['lat'], stores["elements"][i]['lon'], name))
 
     # f.close()
-    pois = []
-    readPOIs(pois, "./Data/stores.txt")
 
-    items = []
-    readItems(items, "./Data/storesPerItem.txt")
-    # print(len(pois[0].items))
-
-    readStoreItems(pois, "./Data/itemsPerStore.txt")
-
-
-    # create a 2d array calculating the distance between each pois
+        # create a 2d array calculating the distance between each pois
     # sp = [[0 for x in range(len(pois))] for y in range(len(pois))]
     # for i in range(len(pois)):
     #     for j in range(len(pois)):
     #         if i != j:
     #             sp[i][j] = calculateDistance(pois[i], pois[j])
 
-    point = (pois[0].lat, pois[0].lon)
+    # point = (pois[0].lat, pois[0].lon)
 
-    u, v, k, edge_geom, dist = ox.distance.get_nearest_edge(G, point, return_geom=True, return_dist=True)
+    # u, v, k, edge_geom, dist = ox.distance.get_nearest_edge(G, point, return_geom=True, return_dist=True)
 
-    # create shapely point geometry object as (x, y), that is (lng, lat)
-    point_geom = Point(reversed(point))
+    # # create shapely point geometry object as (x, y), that is (lng, lat)
+    # point_geom = Point(reversed(point))
 
-    # use shapely to find the point along the edge that is closest to the reference point
-    nearest_point_on_edge = edge_geom.interpolate(edge_geom.project(point_geom))
-    nearest_point_on_edge.coords[0]
-    # dist = ox.distance.shortest_path(G, pois[0].id, pois[1].id, weight='length', cpus=1)
-    print(nearest_point_on_edge.coords[0])
+    # # use shapely to find the point along the edge that is closest to the reference point
+    # nearest_point_on_edge = edge_geom.interpolate(edge_geom.project(point_geom))
+    # nearest_point_on_edge.coords[0]
+    # # dist = ox.distance.shortest_path(G, pois[0].id, pois[1].id, weight='length', cpus=1)
+    # print(nearest_point_on_edge.coords[0])
+    # print(nearest_point_on_edge)
+    # print(u)
+    # print(v)
 
-def readPOIs(pois, location):
+    travelWeight = 0.2
+    costWeight = 1 - travelWeight
+
+    graph = nx.Graph()
+    
+    edges = {}
+    readGraph(graph, edges, "./datasets/Amsterdam/roadnetwork/RoadVerticesAMS.txt", "./datasets/Amsterdam/roadnetwork/RoadEdgesAMS.txt")
+    # print(edges[107365])
+    # print("graph completed")
+
+    pois = []
+    readPOIs(pois, graph, edges, "./datasets/Amsterdam/poi/originals/PoiAMS50.txt")
+
+    items = []
+    readItems(items, "./datasets/Amsterdam/poi/originals/Item_Cost/StoresPerItemAMS_Cost_INward.txt")
+    # print(len(pois[0].items))
+
+    readStoreItems(pois, "./datasets/Amsterdam/poi/originals/Item_Cost/ItemsPerStoreAMS_Cost_INward.txt")
+
+    sp = [[0 for j in range(51)] for i in range(51)] # sp has distance between each POI
+    # print("poi len: {}".format(len(pois)))
+    readSP(sp, len(pois), "./datasets/Amsterdam/poi/originals/ShortestPathPoi50.txt")
+    #print(sp)
+    # print(pois[0].closestNode)
+
+    startNode = graph.nodes[8020]
+    # calculate distance between each POI and startNode
+    startToPOIs = []
+    calculateLocationToPOIsDist(graph, startNode, pois, startToPOIs, sp, 1)
+    
+    endNode = graph.nodes[88896]
+    # calculate distance between each POI and endNode
+    endToPOIs = []
+    calculateLocationToPOIsDist(graph, endNode, pois, endToPOIs, sp, travelWeight)
+
+    # have a 3d array for start to each POI and buying items
+    startToPOIItemArray = [[[None, None] for i in range(1000)] for i in range(len(pois))]
+    createStart3DArray(startToPOIItemArray, startToPOIs, pois, travelWeight, costWeight) # indices with value null means that the item cannot be bought from that POI
+    startToPOIItemArray0_sorted = (sorted(startToPOIItemArray[50], key=lambda x: float('inf') if x[1] is None else x[1])) # this is how we sort rows in a 2d array
+    # need to pass a single row to sort the row above
+
+    # maybe I can sort every single row of items so that our algorithm can find the cheapest item to buy faster
+    
+
+
+    # sort startToPOIItemArray by the cost of the item to be bought
+    # startToPOIItemArray = sorted(startToPOIItemArray, key=lambda x: x[1])
+    # print(startToPOIItemArray0_sorted)
+    # print(startToPOIItemArray[1])
+    # print(startToPOIItemArray[1])
+
+    # create a 3D array of 51 POIs with 51 POIs with 999 items with default value of None
+    currentToNextItemArray = [[[[None, None] for j in range(1000)] for i in range(len(pois))] for k in range(len(pois))]
+    create3DArray(currentToNextItemArray, sp, pois, travelWeight, costWeight)
+    # print(len(currentToNextItemArray))
+    # print(currentToNextItemArray[0])
+    # print(len(currentToNextItemArray[0][0]))
+
+    # our last POIS to ending location is just travelWeight times the travel distance
+    # i do that by passing the travel weight while calculating the distance
+
+    # now we can implement the algorithm
+
+
+
+
+
+
+def readGraph(graph, edges, vertexLocation, edgeLocation):
+    with open(vertexLocation, 'r') as f:
+        for line in f:
+            line = line.strip()
+            line = line.split()
+            graph.add_node(int(line[0]), long = float(line[1]), lat = float(line[2]), poi = 0)
+        # print(graph.nodes[0])
+
+    f.close()
+
+    with open(edgeLocation, 'r') as f:
+        for line in f:
+            line = line.strip()
+            line = line.split()
+            graph.add_edge(int(line[1]), int(line[2]))
+            edges[int(line[0])] = [int(line[1]), int(line[2])]
+
+    # print(graph.edges[64061, 64106])
+    f.close()
+
+def readSP(sp, len, location):
+
+    row = 0
+    with open(location, 'r') as f:
+        for line in f:
+            line = line.strip()
+            line = line.split()
+            for col in range(len):
+                sp[row][col] = float(line[col])
+            row += 1
+            if row == len:
+                break
+
+    f.close()
+
+def readPOIs(pois, graph, edges, location):
+    i = 0
     # we should only take 51 stores because items are stored in 51 stores only
     with open(location, 'r') as f:
         for line in f:
             line = line.strip()
             line = line.split()
-            poi = POI(int(line[0]), float(line[1]), float(line[2]), " ".join(line[3:]))
+
+            id = int(line[0])
+            long = float(line[1])
+            lat = float(line[2])
+            eID = int(line[3])
+
+            poi = POI(id, long, lat, eID)
+            poi.n1 = edges[eID][0]
+            poi.n2 = edges[eID][1]
+
+            distN1 = calculateDistance(graph.nodes[poi.n1], poi)
+            distN2 = calculateDistance(graph.nodes[poi.n2], poi)
+
+            if distN1 < distN2:
+                poi.closestNode = poi.n1
+            else:
+                poi.closestNode = poi.n2
+
             pois.append(poi)
+
     f.close()
 
     # print(len(pois))
@@ -148,6 +267,54 @@ def readPOIs(pois, location):
     # for i in pois:
     #     # print(str(i.id) + " " + i.name + " " + str(i.lat) + " " + str(i.lon))
     #     print(i.name)
+
+def calculateDistance(node1, node2):
+    graphNodeLat = node1['lat']
+    graphNodeLong = node1['long']
+    poiNodeLat = node2.lat
+    poiNodeLong = node2.long
+    return math.sqrt(math.pow(graphNodeLat - poiNodeLat, 2) + math.pow(graphNodeLong - poiNodeLong, 2))
+
+
+def calculateLocationToPOIsDist(graph, startNode, pois, startToPOIs, sp, weight=1):
+    for poi in pois:
+        dist = ox.distance.great_circle_vec(startNode['lat'], startNode['long'], poi.lat, poi.long, earth_radius=6371009)
+        dist *= weight 
+        startToPOIs.append(dist)
+        # print(dist)
+    # print(len(startToPOIs))
+    # print()
+
+
+def createStart3DArray(startToPOIItemArray, startToPOIs, pois, travelWeight, costWeight):
+
+    for i in range(len(startToPOIItemArray)):
+        # now i am looking at each poi's item block
+        dist = startToPOIs[i] # i have the dist from start to poi[i]
+        
+        for j in range(len(pois[i].items)):
+            # now i am looking at each item in poi[i]
+            if pois[i].items[j] == 0:
+                continue
+            else:
+                cost = pois[i].items[j]
+                startToPOIItemArray[i][j][0] = j
+                startToPOIItemArray[i][j][1] = costWeight*cost + travelWeight*dist 
+
+def create3DArray(currentToNextItemArray, sp, pois, travelWeight, costWeight):
+    # currentToNextItem arr is currently all None
+
+    for current in range(len(currentToNextItemArray)):
+
+        for next in range(len(currentToNextItemArray)):
+            dist = sp[current][next]
+            for item in range(len(pois[next].items)):
+                if pois[next].items[item] == 0:
+                    continue
+                else:
+                    cost = pois[next].items[item]
+                    currentToNextItemArray[current][next][item][0] = item
+                    currentToNextItemArray[current][next][item][1] = costWeight*cost + travelWeight*dist
 
 
 def readItems(items, location):
