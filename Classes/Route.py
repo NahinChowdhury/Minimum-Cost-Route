@@ -52,7 +52,7 @@ class Route:
         self.latestCost = self.costs[-1]
         return
 
-    def updateN(self, index):
+    def updateN(self, index, value = 1):
         # if len(self.POIs) - 1 < index:
         #     self.n.append(0)
         #     return
@@ -61,5 +61,5 @@ class Route:
             print("There is a gap of more than 2: {}".format(index- len(self.POIs)))
 
 
-        self.n[index] += 1
+        self.n[index] += value
         return 
