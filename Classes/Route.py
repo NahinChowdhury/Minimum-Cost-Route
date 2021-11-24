@@ -8,7 +8,7 @@ class Route:
         self.latestCost = None
 
         self.totalCost = 0
-        self.n = 0
+        self.n = []
 
     def __str__(self):
         return "poi: "+ str(self.POIs) + ", items: " + str(self.items) + ", costs: " + str(self.costs) + ", totalCost: " + str(self.totalCost) + ", n: " + str(self.n)
@@ -16,6 +16,8 @@ class Route:
     def addPOI(self, poi):
         self.POIs.append(poi)
         self.latestPOI = poi
+
+        self.n.append(0)
 
     def addItem(self, item):
         self.items.append(item)
@@ -37,6 +39,7 @@ class Route:
         self.items.pop()
         cost = self.costs.pop()
         self.totalCost -= cost
+        self.n.pop()
 
         if(len(self.POIs) == 0):
             self.latestPOI = None
@@ -49,5 +52,14 @@ class Route:
         self.latestCost = self.costs[-1]
         return
 
-    def updateN(self):
-        self.n += 1
+    def updateN(self, index):
+        # if len(self.POIs) - 1 < index:
+        #     self.n.append(0)
+        #     return
+
+        if (index - len(self.POIs) - 1) >= 2:
+            print("There is a gap of more than 2: {}".format(index- len(self.POIs)))
+
+
+        self.n[index] += 1
+        return 

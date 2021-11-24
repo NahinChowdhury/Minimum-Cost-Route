@@ -26,7 +26,7 @@ def main():
     # poi.setUseless()
 
     # route.POIs[0].id = 15
-    # # Print the route
+    # # Print the routes
     # print(route.POIs[0].id)
 
 
@@ -130,11 +130,11 @@ def main():
     # print(nearest_point_on_edge)
     # print(u)
     # print(v)
-
-    travelWeight = 0.5
+    preCompiutationStartTime = time.time()
+    travelWeight = 1
     costWeight = 1 - travelWeight
 
-    itemsToBuy = [15, 99]
+    itemsToBuy = [1,2,3,4]
 
     graph = nx.Graph()
     
@@ -178,7 +178,6 @@ def main():
     # maybe I can sort every single row of items so that our algorithm can find the cheapest item to buy faster
     
 
-
     # sort startToPOIItemArray by the cost of the item to be bought
     # startToPOIItemArray = sorted(startToPOIItemArray, key=lambda x: x[1])
     # print(startToPOIItemArray0_sorted)
@@ -194,13 +193,30 @@ def main():
     # currentToNextItemArray0_12_sorted = (sorted(currentToNextItemArray[0][12], key=lambda x: float('inf') if x[1] is None else x[1])) # this is how we sort rows in a 2d array
     # print(currentToNextItemArray0_12_sorted)
 
+    preCompiutationEndTime = time.time()
+    preCompiutationDuration = preCompiutationEndTime - preCompiutationStartTime
+    print("preCompiutationDuration: {}".format(preCompiutationDuration))
     # our last POIS to ending location is just travelWeight times the travel distance
     # i do that by passing the travel weight while calculating the distance
 
     # now we can implement the algorithm
 
+    firstAlgStartTime = time.time()
     route = findBestRoute(startToPOIItemArray.copy(), currentToNextItemArray.copy(), endToPOIs.copy(), itemsToBuy.copy())
+    firstAlgEndTime = time.time()
+    firstAlgDuration = firstAlgEndTime - firstAlgStartTime
     print(route)
+    print("firstAlgDuration: {}".format(firstAlgDuration))
+
+
+    print()
+
+    secondAlgStartTime = time.time()
+    route = findBestRouteContinued(startToPOIItemArray.copy(), currentToNextItemArray.copy(), endToPOIs.copy(), itemsToBuy.copy())
+    secondAlgEndTime = time.time()
+    secondAlgDuration = secondAlgEndTime - secondAlgStartTime
+    print(route)
+    print("secondAlgDuration: {}".format(secondAlgDuration))
 
 
 
@@ -363,7 +379,7 @@ def findBestRoute(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsT
 
     startRoute.addPOI(startRouteInfo[0])
     startRoute.addItem(startRouteInfo[1])
-    startRoute.addCost(startRouteInfo[2])
+    startRoute.addCost(startRouteInfo[2]) # no need to error check here because we know it is not None
 
     # print(startRoute)
 
@@ -375,14 +391,15 @@ def findBestRoute(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsT
     # startRoute1.addCost(1)
 
     # PQ.insert(startRoute1)
-    print("poi len: {}".format(len(startRoute.POIs)))
+    # print("poi len: {}".format(len(startRoute.POIs)))
 
     count = 0
+    print(count)
     while not PQ.isEmpty():
         r = PQ.pop()
         
         if SatisfyList(r, itemsToBuy):
-            print("satisfied")
+            # print("satisfied")
             # get the latestPOI
             # for debugging
             if len(r.items) != len(itemsToBuy):
@@ -400,36 +417,161 @@ def findBestRoute(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsT
 
         nextR = nextItemRoute(r, currentToNextItemArray.copy())
 
-        nextMinCostR = Route()
-        print("poi len: {}".format(len(r.POIs)))
+        nextMinCostR = duplicateRoute(r)
+        # print("poi len: {}".format(len(r.POIs)))
         if len(r.POIs) == 1:
             # print("in")
-            nextMinCostR.n = r.n + 1
+            nextMinCostR.removeLatestPOI()
+            # nextMinCostR.updateN(0)
+            # print(nextMinCostR.n)
+            n = r.n[0] + 1
 
-            startRouteInfo = MinCost(nextMinCostR, startToPOIItemArray.copy())
+            startRouteInfo = MinCost(nextMinCostR, startToPOIItemArray.copy(), n)
+
+            if startRouteInfo == None or None in startRouteInfo:
+                continue
             # print(startRouteInfo)
-
+            # print(startRouteInfo)
             
             nextMinCostR.addPOI(startRouteInfo[0])
+            nextMinCostR.n[0] = n
+            nextMinCostR.addItem(startRouteInfo[1])
+            nextMinCostR.addCost(startRouteInfo[2])
+            # print(nextMinCostR.POIs)
+
+        else:
+            nextMinCostR = nextMinCostRoute(r, currentToNextItemArray.copy())
+
+        if nextR != None:
+            # print("nextR below")
+            # print(nextR)
+            PQ.insert(nextR)
+        if nextMinCostR != None:
+            # print("nextMinCost below")
+            # print(nextMinCostR)
+            PQ.insert(nextMinCostR)
+        
+        
+        count += 1
+        # print(count)
+
+    print("count for first alg: {}".format(count))
+    return potentialRoute
+
+
+
+def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsToBuy):
+    potentialRoute = None
+    PQ = PriorityQueue()
+
+    startRoute = Route()
+    startRouteInfo = MinCost(startRoute, startToPOIItemArray.copy())
+    # print(startRouteInfo)
+
+    startRoute.addPOI(startRouteInfo[0])
+    startRoute.addItem(startRouteInfo[1])
+    startRoute.addCost(startRouteInfo[2])
+
+    # print(startRoute)
+
+    PQ.insert(startRoute)
+
+    weightUpperBound = float('inf')
+
+    # startRoute1 = Route()
+    # startRoute1.addPOI(1)
+    # startRoute1.addItem(1)
+    # startRoute1.addCost(1)
+
+    # PQ.insert(startRoute1)
+    # print("poi len: {}".format(len(startRoute.POIs)))
+
+    count = 0
+    pruned = 0
+    while not PQ.isEmpty():
+        r = PQ.pop()
+        print(r.POIs)
+        if r.totalCost > weightUpperBound:
+            pruned += 1
+            continue
+        
+        if SatisfyList(r, itemsToBuy):
+            # print("satisfied")
+            # get the latestPOI
+            # for debugging
+            if len(r.items) != len(itemsToBuy):
+                print("error")
+                for i in range(len(r.items)):
+                    print("poi: {}, item: {}, weight: {}".format(r.pois[i], r.items[i], r.costs[i]))
+                
+                return
+
+            latestPOI = r.latestPOI
+            finalWeight = endToPOIs[latestPOI]
+            r.addFinalCost(finalWeight)
+
+            if potentialRoute == None:
+                potentialRoute = r
+                weightUpperBound = r.totalCost
+            else:
+                if r.totalCost < potentialRoute.totalCost:
+                    print("accepted below")
+                    potentialRoute = r
+                    weightUpperBound = r.totalCost
+            print("Upperbound cost: " + str(potentialRoute.totalCost) + ", potential cost: {}".format(r.totalCost) )
+            continue
+            # return potentialRoute
+
+        nextR = nextItemRoute(r, currentToNextItemArray.copy())
+
+        nextMinCostR = duplicateRoute(r)
+        
+        # print("poi len: {}".format(len(r.POIs)))
+        if len(r.POIs) == 1:
+            # print("in")
+            nextMinCostR.removeLatestPOI()
+
+            # nextMinCostR.updateN(0)
+            n = r.n[0] + 1
+            startRouteInfo = MinCost(nextMinCostR, startToPOIItemArray.copy(), n)
+            # print(startRouteInfo)
+            if startRouteInfo == None or None in startRouteInfo:
+                continue
+            
+            nextMinCostR.addPOI(startRouteInfo[0])
+            nextMinCostR.n[0] = n
             nextMinCostR.addItem(startRouteInfo[1])
             nextMinCostR.addCost(startRouteInfo[2])
 
         else:
             nextMinCostR = nextMinCostRoute(r, currentToNextItemArray.copy())
 
-        if nextR != None:
-            print("nextR below")
-            print(nextR)
+        if nextR != None and nextR.totalCost < weightUpperBound:
+            # print("nextR below")
+            # print(nextR)
             PQ.insert(nextR)
-        if nextMinCostR != None:
-            print("nextMinCost below")
-            print(nextMinCostR)
+        if nextMinCostR != None and nextMinCostR.totalCost < weightUpperBound:
+            # print("nextMinCost below")
+            # print(nextMinCostR)
             PQ.insert(nextMinCostR)
         
-        print(count)
+        # print(count)
         count += 1
-    
+
+    print("count for second alg: {}".format(count))
+    print("pruned: {}".format(pruned))
     return potentialRoute
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -446,39 +588,56 @@ def nextItemRoute(route, currentToNextItemArray):
     newRoute = duplicateRoute(route)
     
     currPOI = route.latestPOI
-    nextRouteInfo = getMinCost(route, currentToNextItemArray[currPOI].copy())
+    nextRouteInfo = getMinCost(newRoute, currentToNextItemArray[currPOI].copy())
+
+    if nextRouteInfo == None or None in nextRouteInfo:
+        return None
+
     newRoute.addPOI(nextRouteInfo[0])
     newRoute.addItem(nextRouteInfo[1])
     newRoute.addCost(nextRouteInfo[2])
+
+    # newRoute.updateN(len(newRoute.POIs) - 1)
 
     return newRoute
 
 
 def nextMinCostRoute(route, currentToNextItemArray):
-
-    if route.n >= len(currentToNextItemArray):
-        return None
+    
 
     newRoute = duplicateRoute(route)
+    
     newRoute.removeLatestPOI()
+    n = route.n[len(newRoute.POIs) - 1] + 1
 
-    currPOI = route.latestPOI
-    nextRouteInfo = getMinCost(route, currentToNextItemArray[currPOI].copy())
+    newRoute.n[len(newRoute.POIs) - 1] = n
+
+    currPOI = newRoute.latestPOI
+    nextRouteInfo = getMinCost(newRoute, currentToNextItemArray[currPOI].copy())
+    if nextRouteInfo == None or None in nextRouteInfo:
+        return None
+
     newRoute.addPOI(nextRouteInfo[0])
     newRoute.addItem(nextRouteInfo[1])
     newRoute.addCost(nextRouteInfo[2])
 
-    newRoute.updateN()
+    
 
     return newRoute
 
 
 
-def MinCost(route, startToPOIItemArray):
-    n = route.n
+def MinCost(route, startToPOIItemArray, n = 0):
 
-    if route.n >= len(startToPOIItemArray):
-        return None
+    if len(route.n) == 0:
+        pass
+    else:
+        n = route.n[len(route.POIs) - 1]
+
+    for nVal in route.n:
+        if nVal >= len(startToPOIItemArray):
+            return None
+
     # get the sorted weights for each row(or POI)
     # create a new array with poi number, item number, and weight
     # sort the array by weight
@@ -506,13 +665,18 @@ def MinCost(route, startToPOIItemArray):
     # print(sortedPOIs)
 
     if n == 0:
-        print(sortedPOIs)
+        # print(sortedPOIs)
+        pass
     return sortedPOIs[n]
 
 def getMinCost(route, array):
 
-    n = route.n
+    n = route.n[- 1]
     
+    for nVal in route.n:
+        if nVal >= len(array):
+            return None
+
     sortedItemsPerPOI = []
     for i in range(len(array)):
         sortedItemsPerPOI.append(sorted(array[i], key=lambda x: float('inf') if x[1] is None else x[1]))
@@ -546,7 +710,7 @@ def filterArray(sortedItemsPerPOI, route, i):
     j = 0
     length = len(sortedItemsPerPOI[i])
     while j <= length - 1:
-        if sortedItemsPerPOI[i][j][0] == None:
+        if sortedItemsPerPOI[i][j][1] == None: # if the item is not bought from the poi as it has cost of None
             return sortedItemsPerPOI
         if sortedItemsPerPOI[i][j][0] in route.items:
             sortedItemsPerPOI[i].pop(j)
@@ -572,7 +736,10 @@ def duplicateRoute(route):
         newRoute.addCost(cost)
 
     newRoute.totalCost = route.totalCost
-    newRoute.n = route.n
+
+    i = 0
+    for n in route.n:
+        newRoute.n[i] = n
 
 
     return newRoute
