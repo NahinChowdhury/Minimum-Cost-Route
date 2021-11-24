@@ -212,7 +212,7 @@ def main():
     print()
 
     secondAlgStartTime = time.time()
-    route = findBestRouteContinued(startToPOIItemArray.copy(), currentToNextItemArray.copy(), endToPOIs.copy(), itemsToBuy.copy())
+    route = findBestRouteContinued(startToPOIItemArray.copy(), currentToNextItemArray.copy(), endToPOIs.copy(), itemsToBuy.copy(), pois, endNode)
     secondAlgEndTime = time.time()
     secondAlgDuration = secondAlgEndTime - secondAlgStartTime
     print(route)
@@ -322,12 +322,6 @@ def readStoreItems(pois, location):
     #     print(i)
 
 
-def calculateDistance(node1, node2):
-    graphNodeLat = node1['lat']
-    graphNodeLong = node1['long']
-    poiNodeLat = node2.lat
-    poiNodeLong = node2.long
-    return math.sqrt(math.pow(graphNodeLat - poiNodeLat, 2) + math.pow(graphNodeLong - poiNodeLong, 2))
 
 def calculateLocationToPOIsDist(startNode, pois, startToPOIs, weight=1):
     for poi in pois:
@@ -461,7 +455,7 @@ def findBestRoute(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsT
 
 
 
-def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsToBuy):
+def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsToBuy, pois, endNode):
     potentialRoute = None
     PQ = PriorityQueue()
 
@@ -479,23 +473,28 @@ def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOI
 
     weightUpperBound = float('inf')
 
-    # startRoute1 = Route()
-    # startRoute1.addPOI(1)
-    # startRoute1.addItem(1)
-    # startRoute1.addCost(1)
-
-    # PQ.insert(startRoute1)
     # print("poi len: {}".format(len(startRoute.POIs)))
 
     count = 0
     pruned = 0
     while not PQ.isEmpty():
         r = PQ.pop()
-        print(r.POIs)
+        # print(r.POIs)
         if r.totalCost > weightUpperBound:
             pruned += 1
             continue
         
+        # potentialDist = ox.distance.euclidean_dist_vec(pois[r.latestPOI].lat, pois[r.latestPOI].long, endNode['lat'], endNode['long'] )
+        # find euclidean distance between latestPOI and endNode
+
+        # calculateGeoDistance return the distance in km. Need to convert it to m
+        # potentialDist = calculateGeoDistance(endNode, pois[r.latestPOI]) * 1000
+        
+        # print(potentialDist)
+        # if r.totalCost + potentialDist > weightUpperBound: # this approach is not working because it is not giving me the optimal route
+        #     pruned += 1
+        #     continue
+
         if SatisfyList(r, itemsToBuy):
             # print("satisfied")
             # get the latestPOI
@@ -509,6 +508,7 @@ def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOI
 
             latestPOI = r.latestPOI
             finalWeight = endToPOIs[latestPOI]
+            print("finalWeight: {}".format(finalWeight))
             r.addFinalCost(finalWeight)
 
             if potentialRoute == None:
@@ -516,10 +516,10 @@ def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOI
                 weightUpperBound = r.totalCost
             else:
                 if r.totalCost < potentialRoute.totalCost:
-                    print("accepted below")
+                    # print("accepted below")
                     potentialRoute = r
                     weightUpperBound = r.totalCost
-            print("Upperbound cost: " + str(potentialRoute.totalCost) + ", potential cost: {}".format(r.totalCost) )
+            # print("Upperbound cost: " + str(potentialRoute.totalCost) + ", potential cost: {}".format(r.totalCost) )
             continue
             # return potentialRoute
 
@@ -745,6 +745,32 @@ def duplicateRoute(route):
 
     return newRoute
 
+def calculateDistance(node1, node2):
+    graphNodeLat = node1['lat']
+    graphNodeLong = node1['long']
+    poiNodeLat = node2.lat
+    poiNodeLong = node2.long
+    return math.sqrt(math.pow(graphNodeLat - poiNodeLat, 2) + math.pow(graphNodeLong - poiNodeLong, 2))
 
+
+def calculateGeoDistance(node, poi):
+    # Code taken from stackoverflow
+    # https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude
+    # Haversine formula
+    # approximate radius of earth in km
+    R = 6373.0
+
+    lat1 = math.radians(node['lat'])
+    lon1 = math.radians(node['long'])
+    lat2 = math.radians(poi.lat)
+    lon2 = math.radians(poi.long)
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    return R * c
 main()
 
