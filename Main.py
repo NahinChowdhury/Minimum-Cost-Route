@@ -1,6 +1,7 @@
 from Classes.Item import Item
 from Classes.POI import POI
 from Classes.Route import Route
+from DataStructures.PriorityQueue import PriorityQueue
 
 import networkx as nx
 import osmnx as ox
@@ -130,8 +131,10 @@ def main():
     # print(u)
     # print(v)
 
-    travelWeight = 0.2
+    travelWeight = 0.5
     costWeight = 1 - travelWeight
+
+    itemsToBuy = [15, 99]
 
     graph = nx.Graph()
     
@@ -158,18 +161,19 @@ def main():
     startNode = graph.nodes[8020]
     # calculate distance between each POI and startNode
     startToPOIs = []
-    calculateLocationToPOIsDist(graph, startNode, pois, startToPOIs, sp, 1)
+    calculateLocationToPOIsDist(startNode, pois, startToPOIs, 1)
     
     endNode = graph.nodes[88896]
     # calculate distance between each POI and endNode
     endToPOIs = []
-    calculateLocationToPOIsDist(graph, endNode, pois, endToPOIs, sp, travelWeight)
+    calculateLocationToPOIsDist(endNode, pois, endToPOIs, travelWeight)
 
     # have a 3d array for start to each POI and buying items
     startToPOIItemArray = [[[None, None] for i in range(1000)] for i in range(len(pois))]
-    createStart3DArray(startToPOIItemArray, startToPOIs, pois, travelWeight, costWeight) # indices with value null means that the item cannot be bought from that POI
-    startToPOIItemArray0_sorted = (sorted(startToPOIItemArray[50], key=lambda x: float('inf') if x[1] is None else x[1])) # this is how we sort rows in a 2d array
+    createStart3DArray(startToPOIItemArray, startToPOIs, pois, itemsToBuy, travelWeight, costWeight) # indices with value null means that the item cannot be bought from that POI
+    # startToPOIItemArray0_sorted = (sorted(startToPOIItemArray[0], key=lambda x: float('inf') if x[1] is None else x[1])) # this is how we sort rows in a 2d array
     # need to pass a single row to sort the row above
+    # print(startToPOIItemArray[1])
 
     # maybe I can sort every single row of items so that our algorithm can find the cheapest item to buy faster
     
@@ -183,16 +187,20 @@ def main():
 
     # create a 3D array of 51 POIs with 51 POIs with 999 items with default value of None
     currentToNextItemArray = [[[[None, None] for j in range(1000)] for i in range(len(pois))] for k in range(len(pois))]
-    create3DArray(currentToNextItemArray, sp, pois, travelWeight, costWeight)
+    create3DArray(currentToNextItemArray, sp, pois, itemsToBuy, travelWeight, costWeight)
     # print(len(currentToNextItemArray))
     # print(currentToNextItemArray[0])
     # print(len(currentToNextItemArray[0][0]))
+    # currentToNextItemArray0_12_sorted = (sorted(currentToNextItemArray[0][12], key=lambda x: float('inf') if x[1] is None else x[1])) # this is how we sort rows in a 2d array
+    # print(currentToNextItemArray0_12_sorted)
 
     # our last POIS to ending location is just travelWeight times the travel distance
     # i do that by passing the travel weight while calculating the distance
 
     # now we can implement the algorithm
 
+    route = findBestRoute(startToPOIItemArray.copy(), currentToNextItemArray.copy(), endToPOIs.copy(), itemsToBuy.copy())
+    print(route)
 
 
 
@@ -268,55 +276,6 @@ def readPOIs(pois, graph, edges, location):
     #     # print(str(i.id) + " " + i.name + " " + str(i.lat) + " " + str(i.lon))
     #     print(i.name)
 
-def calculateDistance(node1, node2):
-    graphNodeLat = node1['lat']
-    graphNodeLong = node1['long']
-    poiNodeLat = node2.lat
-    poiNodeLong = node2.long
-    return math.sqrt(math.pow(graphNodeLat - poiNodeLat, 2) + math.pow(graphNodeLong - poiNodeLong, 2))
-
-
-def calculateLocationToPOIsDist(graph, startNode, pois, startToPOIs, sp, weight=1):
-    for poi in pois:
-        dist = ox.distance.great_circle_vec(startNode['lat'], startNode['long'], poi.lat, poi.long, earth_radius=6371009)
-        dist *= weight 
-        startToPOIs.append(dist)
-        # print(dist)
-    # print(len(startToPOIs))
-    # print()
-
-
-def createStart3DArray(startToPOIItemArray, startToPOIs, pois, travelWeight, costWeight):
-
-    for i in range(len(startToPOIItemArray)):
-        # now i am looking at each poi's item block
-        dist = startToPOIs[i] # i have the dist from start to poi[i]
-        
-        for j in range(len(pois[i].items)):
-            # now i am looking at each item in poi[i]
-            if pois[i].items[j] == 0:
-                continue
-            else:
-                cost = pois[i].items[j]
-                startToPOIItemArray[i][j][0] = j
-                startToPOIItemArray[i][j][1] = costWeight*cost + travelWeight*dist 
-
-def create3DArray(currentToNextItemArray, sp, pois, travelWeight, costWeight):
-    # currentToNextItem arr is currently all None
-
-    for current in range(len(currentToNextItemArray)):
-
-        for next in range(len(currentToNextItemArray)):
-            dist = sp[current][next]
-            for item in range(len(pois[next].items)):
-                if pois[next].items[item] == 0:
-                    continue
-                else:
-                    cost = pois[next].items[item]
-                    currentToNextItemArray[current][next][item][0] = item
-                    currentToNextItemArray[current][next][item][1] = costWeight*cost + travelWeight*dist
-
-
 def readItems(items, location):
     with open(location, 'r') as f:
         for line in f:
@@ -347,6 +306,276 @@ def readStoreItems(pois, location):
     #     print(i)
 
 
+def calculateDistance(node1, node2):
+    graphNodeLat = node1['lat']
+    graphNodeLong = node1['long']
+    poiNodeLat = node2.lat
+    poiNodeLong = node2.long
+    return math.sqrt(math.pow(graphNodeLat - poiNodeLat, 2) + math.pow(graphNodeLong - poiNodeLong, 2))
+
+def calculateLocationToPOIsDist(startNode, pois, startToPOIs, weight=1):
+    for poi in pois:
+        dist = ox.distance.great_circle_vec(startNode['lat'], startNode['long'], poi.lat, poi.long, earth_radius=6371009)
+        dist *= weight 
+        startToPOIs.append(dist)
+        # print(dist)
+    # print(len(startToPOIs))
+    # print()
+
+def createStart3DArray(startToPOIItemArray, startToPOIs, pois, itemsToBuy, travelWeight, costWeight):
+
+    for i in range(len(startToPOIItemArray)):
+        # now i am looking at each poi's item block
+        dist = startToPOIs[i] # i have the dist from start to poi[i]
+        
+        for j in range(len(pois[i].items)):
+            # now i am looking at each item in poi[i]
+            if j not in itemsToBuy or pois[i].items[j] == 0:
+                continue
+            else:
+                cost = pois[i].items[j]
+                startToPOIItemArray[i][j][0] = j
+                startToPOIItemArray[i][j][1] = costWeight*cost + travelWeight*dist 
+
+def create3DArray(currentToNextItemArray, sp, pois, itemsToBuy, travelWeight, costWeight):
+    # currentToNextItem arr is currently all None
+
+    for current in range(len(currentToNextItemArray)):
+
+        for next in range(len(currentToNextItemArray)):
+            dist = sp[current][next]
+            for item in range(len(pois[next].items)):
+                if item not in itemsToBuy or pois[next].items[item] == 0:
+                    continue
+                else:
+                    cost = pois[next].items[item]
+                    currentToNextItemArray[current][next][item][0] = item
+                    currentToNextItemArray[current][next][item][1] = costWeight*cost + travelWeight*dist
+
+
+def findBestRoute(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsToBuy):
+    potentialRoute = None
+    PQ = PriorityQueue()
+
+    startRoute = Route()
+    startRouteInfo = MinCost(startRoute, startToPOIItemArray.copy())
+    # print(startRouteInfo)
+
+    startRoute.addPOI(startRouteInfo[0])
+    startRoute.addItem(startRouteInfo[1])
+    startRoute.addCost(startRouteInfo[2])
+
+    # print(startRoute)
+
+    PQ.insert(startRoute)
+
+    # startRoute1 = Route()
+    # startRoute1.addPOI(1)
+    # startRoute1.addItem(1)
+    # startRoute1.addCost(1)
+
+    # PQ.insert(startRoute1)
+    print("poi len: {}".format(len(startRoute.POIs)))
+
+    count = 0
+    while not PQ.isEmpty():
+        r = PQ.pop()
+        
+        if SatisfyList(r, itemsToBuy):
+            print("satisfied")
+            # get the latestPOI
+            # for debugging
+            if len(r.items) != len(itemsToBuy):
+                print("error")
+                for i in range(len(r.items)):
+                    print("poi: {}, item: {}, weight: {}".format(r.pois[i], r.items[i], r.costs[i]))
+                
+                return
+
+            latestPOI = r.latestPOI
+            finalWeight = endToPOIs[latestPOI]
+            r.addFinalCost(finalWeight)
+            potentialRoute = r
+            return potentialRoute
+
+        nextR = nextItemRoute(r, currentToNextItemArray.copy())
+
+        nextMinCostR = Route()
+        print("poi len: {}".format(len(r.POIs)))
+        if len(r.POIs) == 1:
+            # print("in")
+            nextMinCostR.n = r.n + 1
+
+            startRouteInfo = MinCost(nextMinCostR, startToPOIItemArray.copy())
+            # print(startRouteInfo)
+
+            
+            nextMinCostR.addPOI(startRouteInfo[0])
+            nextMinCostR.addItem(startRouteInfo[1])
+            nextMinCostR.addCost(startRouteInfo[2])
+
+        else:
+            nextMinCostR = nextMinCostRoute(r, currentToNextItemArray.copy())
+
+        if nextR != None:
+            print("nextR below")
+            print(nextR)
+            PQ.insert(nextR)
+        if nextMinCostR != None:
+            print("nextMinCost below")
+            print(nextMinCostR)
+            PQ.insert(nextMinCostR)
+        
+        print(count)
+        count += 1
+    
+    return potentialRoute
+
+
+
+def SatisfyList(route, itemsToBuy):
+    # if there is one item missing, return false
+    for i in itemsToBuy:
+        if i not in route.items:
+            return False
+    return True
+
+
+
+def nextItemRoute(route, currentToNextItemArray):
+    newRoute = duplicateRoute(route)
+    
+    currPOI = route.latestPOI
+    nextRouteInfo = getMinCost(route, currentToNextItemArray[currPOI].copy())
+    newRoute.addPOI(nextRouteInfo[0])
+    newRoute.addItem(nextRouteInfo[1])
+    newRoute.addCost(nextRouteInfo[2])
+
+    return newRoute
+
+
+def nextMinCostRoute(route, currentToNextItemArray):
+
+    if route.n >= len(currentToNextItemArray):
+        return None
+
+    newRoute = duplicateRoute(route)
+    newRoute.removeLatestPOI()
+
+    currPOI = route.latestPOI
+    nextRouteInfo = getMinCost(route, currentToNextItemArray[currPOI].copy())
+    newRoute.addPOI(nextRouteInfo[0])
+    newRoute.addItem(nextRouteInfo[1])
+    newRoute.addCost(nextRouteInfo[2])
+
+    newRoute.updateN()
+
+    return newRoute
+
+
+
+def MinCost(route, startToPOIItemArray):
+    n = route.n
+
+    if route.n >= len(startToPOIItemArray):
+        return None
+    # get the sorted weights for each row(or POI)
+    # create a new array with poi number, item number, and weight
+    # sort the array by weight
+    # get the first item number and poi number and weight
+
+    sortedItemsPerPOI = []
+    for i in range(len(startToPOIItemArray)):
+        sortedItemsPerPOI.append(sorted(startToPOIItemArray[i], key=lambda x: float('inf') if x[1] is None else x[1]))
+
+    # print(startToPOIItemArray[0])
+
+    # for i in sortedItemsPerPOI:
+        # print(i[0])
+
+    # print("\n")
+    sortedPOIs = []
+    for i in range(len(sortedItemsPerPOI)):
+        poiItemWeightList = []
+        poiItemWeightList.append(i) 
+        poiItemWeightList.append(sortedItemsPerPOI[i][0][0]) 
+        poiItemWeightList.append(sortedItemsPerPOI[i][0][1]) # i 0 1 here because i want the best weight from each poi
+        sortedPOIs.append(poiItemWeightList)
+
+    sortedPOIs = sorted(sortedPOIs, key=lambda x: float('inf') if x[2] is None else x[2])
+    # print(sortedPOIs)
+
+    if n == 0:
+        print(sortedPOIs)
+    return sortedPOIs[n]
+
+def getMinCost(route, array):
+
+    n = route.n
+    
+    sortedItemsPerPOI = []
+    for i in range(len(array)):
+        sortedItemsPerPOI.append(sorted(array[i], key=lambda x: float('inf') if x[1] is None else x[1]))
+
+
+    # I have a list of sorted items
+    # i should filter each row such that eahc row only has the items i need to buy
+    # then i should sort the rows by weight
+    # then i should get the first item and poi number and weight
+
+    sortedPOIs = []
+    for i in range(len(sortedItemsPerPOI)):
+        poiItemWeightList = []
+        poiItemWeightList.append(i)
+
+        sortedItemsPerPOI = filterArray(sortedItemsPerPOI.copy(), route, i) # filters every
+        poiItemWeightList.append(sortedItemsPerPOI[i][0][0]) # new filtered array's index 0 should have the lowest weight item which i havent bough yet
+        poiItemWeightList.append(sortedItemsPerPOI[i][0][1])
+        sortedPOIs.append(poiItemWeightList)
+
+    
+    sortedPOIs = sorted(sortedPOIs, key=lambda x: float('inf') if x[2] is None else x[2])
+    # print(sortedPOIs)
+
+    return sortedPOIs[n]
+
+
+
+def filterArray(sortedItemsPerPOI, route, i):
+    
+    j = 0
+    length = len(sortedItemsPerPOI[i])
+    while j <= length - 1:
+        if sortedItemsPerPOI[i][j][0] == None:
+            return sortedItemsPerPOI
+        if sortedItemsPerPOI[i][j][0] in route.items:
+            sortedItemsPerPOI[i].pop(j)
+            length = len(sortedItemsPerPOI[i])
+        else:
+            j += 1
+    
+    return sortedItemsPerPOI
+
+
+def duplicateRoute(route):
+    newRoute = Route()
+    newRoute.POIs = [] 
+    for poi in route.POIs:
+        newRoute.addPOI(poi)
+
+    newRoute.items = []
+    for item in route.items:
+        newRoute.addItem(item)
+
+    newRoute.costs = []
+    for cost in route.costs:
+        newRoute.addCost(cost)
+
+    newRoute.totalCost = route.totalCost
+    newRoute.n = route.n
+
+
+    return newRoute
 
 
 main()
