@@ -130,11 +130,11 @@ def main():
     # print(nearest_point_on_edge)
     # print(u)
     # print(v)
-    preCompiutationStartTime = time.time()
+    preComputationStartTime = time.time()
     travelWeight = 1
     costWeight = 1 - travelWeight
 
-    itemsToBuy = [1,2,3]#,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+    itemsToBuy = [1,2,3]#,4,5,6,7,8,9,10,11,12,13]#,14,15,16,17,18,19,20]
 
     graph = nx.Graph()
     
@@ -193,9 +193,9 @@ def main():
     # currentToNextItemArray0_12_sorted = (sorted(currentToNextItemArray[0][12], key=lambda x: float('inf') if x[1] is None else x[1])) # this is how we sort rows in a 2d array
     # print(currentToNextItemArray0_12_sorted)
 
-    preCompiutationEndTime = time.time()
-    preCompiutationDuration = preCompiutationEndTime - preCompiutationStartTime
-    print("preCompiutationDuration: {}".format(preCompiutationDuration))
+    preComputationEndTime = time.time()
+    preComputationDuration = preComputationEndTime - preComputationStartTime
+    print("preCompiutationDuration: {}".format(preComputationDuration))
     # our last POIS to ending location is just travelWeight times the travel distance
     # i do that by passing the travel weight while calculating the distance
 
@@ -212,7 +212,7 @@ def main():
     print()
 
     secondAlgStartTime = time.time()
-    route = findBestRouteContinued(startToPOIItemArray.copy(), currentToNextItemArray.copy(), endToPOIs.copy(), itemsToBuy.copy(), pois, endNode)
+    route = findBestRouteContinued(startToPOIItemArray.copy(), currentToNextItemArray.copy(), endToPOIs.copy(), itemsToBuy.copy(), pois, endNode, travelWeight)
     secondAlgEndTime = time.time()
     secondAlgDuration = secondAlgEndTime - secondAlgStartTime
     print(route)
@@ -388,7 +388,7 @@ def findBestRoute(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsT
     # print("poi len: {}".format(len(startRoute.POIs)))
 
     count = 0
-    print(count)
+    # print(count)
     while not PQ.isEmpty():
         r = PQ.pop()
         
@@ -455,7 +455,7 @@ def findBestRoute(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsT
 
 
 
-def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsToBuy, pois, endNode):
+def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOIs, itemsToBuy, pois, endNode, travelWeight):
     potentialRoute = None
     PQ = PriorityQueue()
 
@@ -508,7 +508,7 @@ def findBestRouteContinued(startToPOIItemArray, currentToNextItemArray, endToPOI
 
             latestPOI = r.latestPOI
             finalWeight = endToPOIs[latestPOI]
-            print("finalWeight: {}".format(finalWeight))
+            # print("finalWeight: {}".format(finalWeight))
             r.addFinalCost(finalWeight)
 
             if potentialRoute == None:
