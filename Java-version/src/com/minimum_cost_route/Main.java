@@ -12,7 +12,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
-import static java.sql.Types.NULL;
 
 public class Main {
 
@@ -144,33 +143,55 @@ public class Main {
 
     }
 
-    public static void setnewItem (ArrayList<POI> P, ArrayList<Item> Itm)
+    public static void pickPoi(ArrayList<POI> pois, int N)
     {
-        double minc = 20;
-        for(int i = 0; i< Itm.size();i++)
+//		int count =0;
+        ArrayList<POI> nPois = new ArrayList<POI>();
+//		while(count<N)
+        // N is 25
+        for(int i = 0; i < 51; i++)
         {
-            Random rand = new Random();
-            double base = rand.nextDouble()*10.0 + 5;
-            //if(base<5)System.out.println("vuaa");
-            int iid = Itm.get(i).id; // get the ith itemID
-            for (int j=Itm.get(i).pois.size()-1;j>=0;j--) // j is the number of stores this item can be found in
-            {
-                int pid = Itm.get(i).pois.get(j); // first poi id where this item is found?
-                if(P.get(pid).items[iid]==0)
-                {
-                    Itm.get(i).pois.remove(j); // remove the POI from item's list if it isn't in the POI's item list(has a cost of 0)?
-                    continue;
-                }
-                else {
-                    Random rand1 = new Random();
-                    double dev = rand1.nextGaussian()%2;
-                    P.get(pid).items[iid]= base + dev;
-                    if(P.get(pid).items[iid]<minc)minc=P.get(pid).items[iid];
-                }
+			Random rand = new Random();
+			int rand_int1 = rand.nextInt(pois.size());
+			POI poi = pois.get(rand_int1);
+//            POI poi = pois.get(i);
+//			System.out.println(poi.ID + " " + poi.latitude + " " + poi.longitude);
 
+            if(i % 2 == 1){
+
+                if(!nPois.contains(poi))
+                {
+                    nPois.add(poi);
+                    //System.out.println("Picked: "+ poi.ID);
+//				count++;
+                }
+            }
+
+        }
+
+//        for(int i=0;i<pois.size();i++)
+//        {
+//            POI p = pois.get(i);
+//            if(!nPois.contains(p))
+//            {
+////                Arrays.fill(p.items,0.0);
+////                p.inactive=1;
+//
+//            }
+//
+//        }
+        int length = pois.size();
+        int i = 0;
+        while(i < length){
+            POI p = pois.get(i);
+            if(!nPois.contains(p)){
+                pois.remove(p);
+            }else{
+                i++;
             }
         }
-        //System.out.println("MINIMUM: "+minc);
+        return;
+
     }
 
     public static void readSP(double [][] sp, int len, String location){
@@ -196,7 +217,6 @@ public class Main {
             e.printStackTrace();
         }
     }
-
 
     public static void calculateLocationToPOIsDist(Node node, ArrayList<POI> pois, double [] locationToPOIs, Graph graph, Float weight){
 
@@ -308,6 +328,7 @@ public class Main {
             }
             else{
                 n = route.n.get(route.n.size()-1);
+                if( n == startToPOIItemArray.length-1) return null;
             }
         }
 
@@ -328,9 +349,9 @@ public class Main {
 
         }
 
-        double [][] sortedPOIs = new double [startToPOIItemArray.length-1][3];
+        double [][] sortedPOIs = new double [startToPOIItemArray.length][3];
 
-        for(int i=0;i<startToPOIItemArray.length -  1;i++){
+        for(int i=0;i<startToPOIItemArray.length;i++){
 
             sortedPOIs[i][0] = i;
             sortedPOIs[i][1] = startToPOIItemArray[i][0][0];
@@ -343,15 +364,22 @@ public class Main {
             }
         });
 
+        if(sortedPOIs[n][0] == Float.POSITIVE_INFINITY || sortedPOIs[n][1] == Float.POSITIVE_INFINITY || sortedPOIs[n][2] == Float.POSITIVE_INFINITY){ // in case you picked an item which is not being sold
+            return null;
+        }
+
         BigDecimal [] returnValue = new BigDecimal[3];
-        returnValue[0] = new BigDecimal(sortedPOIs[n][0]);
-        returnValue[1] = new BigDecimal(sortedPOIs[n][1]);
-        returnValue[2] = new BigDecimal(sortedPOIs[n][2]);
+
+        returnValue[0] = new BigDecimal(""+sortedPOIs[n][0]);
+
+        returnValue[1] = new BigDecimal(""+sortedPOIs[n][1]);
+
+        returnValue[2] = new BigDecimal(""+sortedPOIs[n][2]);
+
 
         return returnValue;
 
     }
-
 
     public static BigDecimal [] getMinCost(Route route, double [][][] currentToNextItemArray){
         Integer n = route.n.get(route.n.size()-1);
@@ -363,51 +391,66 @@ public class Main {
         }
 
         double [][][] sortedItemsPerPOI = new double[currentToNextItemArray.length][currentToNextItemArray[0].length][];
+//        ArrayList<ArrayList<ArrayList<ArrayList<Double>>>> sortedItemsPerPOI= new ArrayList<>();
+
         for (int i = 0; i < currentToNextItemArray.length; i++) {
+            ArrayList<ArrayList<ArrayList<Double>>> temp = new ArrayList<ArrayList<ArrayList<Double>>>();
             for (int j = 0; j < currentToNextItemArray[i].length; j++){
+
                 sortedItemsPerPOI[i][j] = Arrays.copyOf(currentToNextItemArray[i][j], currentToNextItemArray[i][j].length);
+//                  ArrayList<ArrayList<Double>> temp2 = new ArrayList<ArrayList<Double>>();
+//                  for(int k = 0; k < currentToNextItemArray[i][j].length; k++){
+//                      ArrayList<Double> temp3 = new ArrayList<Double>();
+//                      temp3.add(Double.valueOf(currentToNextItemArray[i][j][k]));
+//                      temp2.add(temp3);
+//                  }
+//                temp.add(temp2);
             }
+//            sortedItemsPerPOI.add(temp);
+
 
         }
+//        ArrayList<Integer> temp = new ArrayList<Integer>();
+//        for(int i=0;i<sortedItemsPerPOI.length;i++){
+//            java.util.Arrays.sort(sortedItemsPerPOI[i], new java.util.Comparator<double[]>() {
+//                public int compare(double[] a, double[] b) {
+//                    return Double.compare(a[0], b[0]);
+//                }
+//            });
+//
+//        }
+
+
+
+
+        double [][] sortedPOIs = new double [sortedItemsPerPOI.length][3];
 
         for(int i=0;i<sortedItemsPerPOI.length;i++){
-            java.util.Arrays.sort(sortedItemsPerPOI[i], new java.util.Comparator<double[]>() {
-                public int compare(double[] a, double[] b) {
-                    return Double.compare(a[0], b[0]);
-                }
-            });
 
-        }
-
-
-
-
-        double [][] sortedPOIs = new double [sortedItemsPerPOI.length-1][3];
-
-        for(int i=0;i<sortedItemsPerPOI.length -  1;i++){
-
-//            sortedPOIs[i][0] = i;
             sortedItemsPerPOI = filterArray(sortedItemsPerPOI, route, i);
-
-//            sortedPOIs[i][1] = sortedItemsPerPOI[i][0][0];
-//            sortedPOIs[i][2] = sortedItemsPerPOI[i][0][1];
         }
+
+        // sorting again because the sorted array got modified once.
         for(int i=0;i<sortedItemsPerPOI.length;i++){
             java.util.Arrays.sort(sortedItemsPerPOI[i], new java.util.Comparator<double[]>() {
                 public int compare(double[] a, double[] b) {
-                    return Double.compare(a[0], b[0]);
+                    return Double.compare(a[1], b[1]);
                 }
             });
 
         }
 
-        for(int i=0;i<sortedItemsPerPOI.length -  1;i++){
+
+
+        for(int i=0;i<sortedItemsPerPOI.length;i++){
 
             sortedPOIs[i][0] = i;
 
             sortedPOIs[i][1] = sortedItemsPerPOI[i][0][0];
             sortedPOIs[i][2] = sortedItemsPerPOI[i][0][1];
         }
+
+
 
 //        System.out.println(1);
         java.util.Arrays.sort(sortedPOIs, new java.util.Comparator<double[]>() {
@@ -416,11 +459,18 @@ public class Main {
             }
         });
 
+        if(sortedPOIs[n][0] == Float.POSITIVE_INFINITY || sortedPOIs[n][1] == Float.POSITIVE_INFINITY || sortedPOIs[n][2] == Float.POSITIVE_INFINITY){ // in case you picked an item which is not being sold
+            return null;
+        }
 
         BigDecimal [] returnValue = new BigDecimal[3];
-        returnValue[0] = new BigDecimal(sortedPOIs[n][0]);
-        returnValue[1] = new BigDecimal(sortedPOIs[n][1]);
-        returnValue[2] = new BigDecimal(sortedPOIs[n][2]);
+
+        returnValue[0] = new BigDecimal(""+sortedPOIs[n][0]);
+
+        returnValue[1] = new BigDecimal(""+sortedPOIs[n][1]);
+
+        returnValue[2] = new BigDecimal(""+sortedPOIs[n][2]);
+
 
         return returnValue;
 
@@ -429,14 +479,16 @@ public class Main {
 
     }
 
-
     public static double [][][] filterArray( double [][][] sortedItemsPerPOI, Route route,Integer i){
         int j = 0;
         int length = sortedItemsPerPOI[i].length;
         while(j < length){
+
             if(sortedItemsPerPOI[i][j][1] == Float.POSITIVE_INFINITY){
                 return sortedItemsPerPOI;
             }
+
+
             if( route.items.contains((int) sortedItemsPerPOI[i][j][0])){
                 sortedItemsPerPOI[i][j][0] = Float.POSITIVE_INFINITY;
                 sortedItemsPerPOI[i][j][1] = Float.POSITIVE_INFINITY;
@@ -444,6 +496,8 @@ public class Main {
             }else{
                 j++;
             }
+
+
         }
         return sortedItemsPerPOI;
     }
@@ -466,7 +520,11 @@ public class Main {
         BigDecimal [] nextRouteInfo = new BigDecimal[3];
         nextRouteInfo = getMinCost(newRoute, currentToNextItemArray[currPoi].clone());
 
-        if( nextRouteInfo == null || nextRouteInfo[0].floatValue() == Float.POSITIVE_INFINITY || nextRouteInfo[1].floatValue() == Float.POSITIVE_INFINITY || nextRouteInfo[2].floatValue() == Float.POSITIVE_INFINITY){
+        if( nextRouteInfo == null || nextRouteInfo[0] == null || nextRouteInfo[1] == null || nextRouteInfo[2] == null){
+            return null;
+        }
+
+        if( nextRouteInfo[0].floatValue() == Float.POSITIVE_INFINITY || nextRouteInfo[1].floatValue() == Float.POSITIVE_INFINITY || nextRouteInfo[2].floatValue() == Float.POSITIVE_INFINITY){
             return null;
         }
 
@@ -491,6 +549,11 @@ public class Main {
             return null;
         }
 
+        if( nextRouteInfo[0].floatValue() == Float.POSITIVE_INFINITY || nextRouteInfo[1].floatValue() == Float.POSITIVE_INFINITY || nextRouteInfo[2].floatValue() == Float.POSITIVE_INFINITY){
+            return null;
+        }
+
+
         newRoute.addPOI( nextRouteInfo[0].intValue());
         newRoute.addItem( nextRouteInfo[1].intValue());
         newRoute.addCost( (Float) nextRouteInfo[2].floatValue());
@@ -505,7 +568,7 @@ public class Main {
         PriorityQueue<Route> PQ = new PriorityQueue<Route>(10, C);
         Route startRoute = new Route();
         BigDecimal [] startRouteInfo = new BigDecimal[3];
-        startRouteInfo = MinCost(startRoute, startToPOIItemArray.clone(), null);
+        startRouteInfo = MinCost(startRoute, startToPOIItemArray.clone(), null); // creating incomplete route with lowest combined cost from starting loc
 
         startRoute.addPOI( startRouteInfo[0].intValue());
         startRoute.addItem( startRouteInfo[1].intValue());
@@ -517,6 +580,9 @@ public class Main {
         while(!PQ.isEmpty()){
             Route r = new Route();
             r = PQ.poll();
+            if(count == 72){
+                int a = 0;
+            }
 
             if(SatisfyList(r, itemsToBuy)){
                 if(r.items.size() != itemsToBuy.size()){
@@ -528,9 +594,10 @@ public class Main {
                 }
 
                 Integer latestPoi = r.latestPoi;
-                BigDecimal finalWeight = new BigDecimal( endToPOIs[latestPoi] );
+                BigDecimal finalWeight = new BigDecimal( "" + endToPOIs[latestPoi] ); //""+endToPOIs[latestPoi] because BigDecimal creates unnecessary decimal places otherwise
                 r.addFinalCost(finalWeight.floatValue());
                 potentialRoute = r;
+                System.out.println("First Alg Count: " + count);
                 return potentialRoute;
             }
             Route nextR = nextItemRoute(r, currentToNextItemArray);
@@ -541,8 +608,31 @@ public class Main {
                 nextMinCostR.removeLatestPOI();
                 Integer n = r.n.get(0) + 1;
 
+                if(n >= currentToNextItemArray.length){ // incase we explore every single possible route from start to a POI
+                    if(nextR != null){
+                        PQ.add(nextR);
+                        count++;
+                    }
+                    continue;
+                }
                 BigDecimal [] startRouteNewInfo = new BigDecimal[3];
                 startRouteNewInfo = MinCost(nextMinCostR, startToPOIItemArray.clone(), n);
+
+                if( startRouteNewInfo == null || startRouteNewInfo[0] == null || startRouteNewInfo[1] == null || startRouteNewInfo[2] == null){
+                    if(nextR != null){
+                        PQ.add(nextR);
+                        count++;
+                    }
+                    continue;
+                }
+
+                if( startRouteNewInfo[0].floatValue() == Float.POSITIVE_INFINITY || startRouteNewInfo[1].floatValue() == Float.POSITIVE_INFINITY || startRouteNewInfo[2].floatValue() == Float.POSITIVE_INFINITY){
+                    if(nextR != null){
+                        PQ.add(nextR);
+                        count++;
+                    }
+                    continue;
+                }
 
                 nextMinCostR.addPOI( startRouteNewInfo[0].intValue());
                 nextMinCostR.n.set(0, n);
@@ -564,12 +654,10 @@ public class Main {
         }
 
 
-
-
+        System.out.println("First Alg Count: " + count);
         return potentialRoute;
 
     }
-
 
     public static Route findBestRouteContinued(double [][][] startToPOIItemArray, double [][][][] currentToNextItemArray, double [] endToPOIs, ArrayList<Integer> itemsToBuy){
 
@@ -608,7 +696,7 @@ public class Main {
                 }
 
                 Integer latestPoi = r.latestPoi;
-                BigDecimal finalWeight = new BigDecimal( endToPOIs[latestPoi] );
+                BigDecimal finalWeight = new BigDecimal( "" + endToPOIs[latestPoi] ); //""+endToPOIs[latestPoi] because BigDecimal creates unnecessary decimal places otherwise
                 r.addFinalCost(finalWeight.floatValue());
 
 
@@ -632,8 +720,32 @@ public class Main {
                 nextMinCostR.removeLatestPOI();
                 Integer n = r.n.get(0) + 1;
 
+                if(n >= currentToNextItemArray.length){ // incase we explore every single possible route from start to a POI
+                    if(nextR != null){
+                        PQ.add(nextR);
+                        count++;
+                    }
+                    continue;
+                }
+
                 BigDecimal [] startRouteNewInfo = new BigDecimal[3];
                 startRouteNewInfo = MinCost(nextMinCostR, startToPOIItemArray.clone(), n);
+
+                if( startRouteNewInfo == null || startRouteNewInfo[0] == null || startRouteNewInfo[1] == null || startRouteNewInfo[2] == null){
+                    if(nextR != null){
+                        PQ.add(nextR);
+                        count++;
+                    }
+                    continue;
+                }
+
+                if( startRouteNewInfo[0].floatValue() == Float.POSITIVE_INFINITY || startRouteNewInfo[1].floatValue() == Float.POSITIVE_INFINITY || startRouteNewInfo[2].floatValue() == Float.POSITIVE_INFINITY){
+                    if(nextR != null){
+                        PQ.add(nextR);
+                        count++;
+                    }
+                    continue;
+                }
 
                 nextMinCostR.addPOI( startRouteNewInfo[0].intValue());
                 nextMinCostR.n.set(0, n);
@@ -655,7 +767,8 @@ public class Main {
         }
 
 
-
+        System.out.println("Second Alg Count: " + count);
+        System.out.println("Second Alg Pruned: " + pruned);
 
         return potentialRoute;
 
@@ -669,21 +782,21 @@ public class Main {
         }
     };
 
-    public static double precision(double val)
-    {
+    public static double precision(double val) {
         DecimalFormat df = new DecimalFormat("#.000");
         return Double.valueOf(df.format(val));
     }
+
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 	// write your code here
 
-        Float travelWeight = 1.0f;
-        Float costWeight = 1 - travelWeight;
+        Float travelWeight = 0.0f; // the weight that the user gives to travel
+        Float costWeight = 1 - travelWeight; // the weight that the user gives to cost
 
         ArrayList<Integer> itemsToBuy = new ArrayList<Integer>();
 
         for (int i = 0;i<5;i++){
-            itemsToBuy.add(i);
+            itemsToBuy.add(i); // creating a shopping list
         }
 
 
@@ -694,7 +807,7 @@ public class Main {
 
 
         Graph graph = new SingleGraph("Amsterdam");
-        readGraph(graph);
+        readGraph(graph); // reading graph from available data
 
         readItems(items,"./datasets/Amsterdam/poi/originals/Item_Cost/StoresPerItemAMS_Cost_INward.txt");
 
@@ -702,6 +815,7 @@ public class Main {
 
         readStoreItems(pois, "./datasets/Amsterdam/poi/originals/Item_Cost/ItemsPerStoreAMS_Cost_INward.txt");
 
+//        pickPoi(pois, 20); // pickPois should set poi to inactive and then make sure sp of other pois is set to infinity
 
 //        setnewItem(pois, items);
 
@@ -711,15 +825,15 @@ public class Main {
 
         Node startNode = graph.getNode(8020);
         double [] startToPOIs = new double [pois.size()];
-        calculateLocationToPOIsDist(startNode, pois, startToPOIs, graph, 1.0f);
+        calculateLocationToPOIsDist(startNode, pois, startToPOIs, graph, 1.0f); // calculate the distance from start node to all POIs. Weight is zero here because we use multiple the weight with the distance while computing routes
 
         Node endNode = graph.getNode(88896);
         double [] endToPOIs = new double [pois.size()];
-        calculateLocationToPOIsDist(endNode, pois, endToPOIs, graph, travelWeight);
+        calculateLocationToPOIsDist(endNode, pois, endToPOIs, graph, travelWeight); // calculate the distance from end node to all POIs. Weight is travelWeight here because we don't compute the new travel distance while computing the route
 
-        double [][][] startToPOIItemArray = new double [pois.size()][items.size()][2];
+        double [][][] startToPOIItemArray = new double [pois.size()][items.size()][2]; // start to [poi][item][0] is the itemID, start to [poi][item][1] is the combined weight of the cost of item and travel distance
 
-        // set startToPOIItemArray elements to null
+        // set startToPOIItemArray elements to infinity. Can't use null because of multiple type cast conflict. Infinity works when we want to sort by lowest cost
         for (int i=0;i<pois.size();i++){
             for (int j=0;j<items.size();j++){
                 startToPOIItemArray[i][j][0] = Double.POSITIVE_INFINITY;
@@ -727,11 +841,12 @@ public class Main {
             }
         }
 
-        createStart3DArray(startToPOIItemArray, startToPOIs, pois, itemsToBuy, travelWeight, costWeight);
+        createStart3DArray(startToPOIItemArray, startToPOIs, pois, itemsToBuy, travelWeight, costWeight); // create 3D array containing the combined weight of cost and travel dist from start loc to all pois and items
 
 
-        double [][][][] currentToNextItemArray = new double [pois.size()][pois.size()][items.size()][2];
+        double [][][][] currentToNextItemArray = new double [pois.size()][pois.size()][items.size()][2]; // current poi to [next poi][item][0] is the itemID, current poi to [next poi][item][1] is the combined weight of the cost of item and travel distance
 
+        // set currentToNextItemArray elements to infinity. Can't use null because of multiple type cast conflict. Infinity works when we want to sort by lowest cost
         for (int i=0;i<pois.size();i++){
             for (int j=0;j<pois.size();j++){
                 for (int k=0;k<items.size();k++){
@@ -742,35 +857,70 @@ public class Main {
 
         }
 
-        create3DArray(currentToNextItemArray, sp, pois, itemsToBuy, travelWeight, costWeight);
+        create3DArray(currentToNextItemArray, sp, pois, itemsToBuy, travelWeight, costWeight); // techincally creating a 4D array from one POi to another POi to buy item X. [current][next][item] has 2 values: [0] is the itemID, [1] is the combined weight of the cost of item and travel distance
+
+
+        // sorting the currentToNextItemArray by weight
+        for(int i=0;i<currentToNextItemArray.length;i++){
+            for (int j=0;j<currentToNextItemArray[i].length;j++) {
+                java.util.Arrays.sort(currentToNextItemArray[i][j], new java.util.Comparator<double[]>() {
+                    public int compare(double[] a, double[] b) {
+                        return Double.compare(a[1], b[1]);
+                    }
+                });
+            }
+        }
 
         long preComputationEndTime = System.currentTimeMillis();
         double preComputationDuration = (double) (preComputationEndTime - preComputationStartTime)/ (double) 1000;
 
         System.out.println("Precomputation time: " + preComputationDuration);
 
-        long firstALgStartTime = System.currentTimeMillis();
+        double firstALgAvgDuration = 0;
+        double firstAlgAvgTotalCost = 0;
 
-        Route firstRoute;
+        double secondALgAvgDuration = 0;
+        double secondAlgAvgTotalCost = 0;
 
-        firstRoute = findBestRoute(startToPOIItemArray.clone(), currentToNextItemArray.clone(), endToPOIs.clone(), itemsToBuy);
-        System.out.println("Route: " + firstRoute.toString());
+        int n = 5; // number of times to run the algorithm
+        for (int i=0;i<n;i++) {
+            long firstALgStartTime = System.currentTimeMillis();
 
+            Route firstRoute;
 
-        long firstAlgEndTime = System.currentTimeMillis();
-        System.out.println("First algorithm time: " + (double) (firstAlgEndTime - firstALgStartTime)/ (double) 1000);
-
-        long secondALgStartTime = System.currentTimeMillis();
-
-        Route secondRoute;
-
-        secondRoute = findBestRouteContinued(startToPOIItemArray.clone(), currentToNextItemArray.clone(), endToPOIs.clone(), itemsToBuy);
-        System.out.println("Route: " + secondRoute.toString());
+            firstRoute = findBestRoute(startToPOIItemArray.clone(), currentToNextItemArray.clone(), endToPOIs.clone(), itemsToBuy); // find the first best route from start to end
+            System.out.println("Route: " + firstRoute.toString());
 
 
-        long secondAlgEndTime = System.currentTimeMillis();
-        System.out.println("First algorithm time: " + (double) (secondAlgEndTime - secondALgStartTime)/ (double) 1000);
+            long firstAlgEndTime = System.currentTimeMillis();
+            System.out.println("First algorithm time: " + (double) (firstAlgEndTime - firstALgStartTime) / (double) 1000);
 
+            firstALgAvgDuration += (double) (firstAlgEndTime - firstALgStartTime) / (double) 1000;
+            firstAlgAvgTotalCost += firstRoute.totalCost;
+
+//            long secondALgStartTime = System.currentTimeMillis();
+//
+//            Route secondRoute;
+//
+//            secondRoute = findBestRouteContinued(startToPOIItemArray.clone(), currentToNextItemArray.clone(), endToPOIs.clone(), itemsToBuy);
+//            System.out.println("Route: " + secondRoute.toString());
+//
+//
+//            long secondAlgEndTime = System.currentTimeMillis();
+//            System.out.println("First algorithm time: " + (double) (secondAlgEndTime - secondALgStartTime) / (double) 1000);
+//            System.out.println("");
+//            System.out.println("");
+//
+//            secondALgAvgDuration += (double) (secondAlgEndTime - secondALgStartTime) / (double) 1000;
+//            secondAlgAvgTotalCost += secondRoute.totalCost;
+
+        }
+
+        System.out.println("Average first algorithm time: " + (double) firstALgAvgDuration/ (double) n);
+//        System.out.println("Average second algorithm time: " + (double) secondALgAvgDuration/ (double) n);
+
+        System.out.println("Average first algorithm total cost: " + (double) firstAlgAvgTotalCost/ (double) n);
+//        System.out.println("Average second algorithm total cost: " + (double) secondAlgAvgTotalCost/ (double) n);
 
     }
 }
