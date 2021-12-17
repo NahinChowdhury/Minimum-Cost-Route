@@ -12,6 +12,7 @@ import org.graphstream.graph.implementations.SingleGraph;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -280,6 +281,123 @@ public class Main {
         }
     }
 
+    public static ArrayList<Integer> getAvailablePOIs(ArrayList<POI>pois, ArrayList<Integer>itemsToBuy){
+
+        ArrayList<Integer> availablePOIs = new ArrayList<Integer>();
+        for (int i=0;i<pois.size();i++)
+        {
+            if(pois.get(i).items[itemsToBuy.get(0)]>0)
+                availablePOIs.add(i);
+        }
+        return availablePOIs;
+    }
+
+    public static Route computeNewRoute(Route route, double [][] sortedStartToPOIItemArray, double [][][] sortedCurrentToNextItemArray, double [] endToPOIs, ArrayList<Integer> availablePOIs, ArrayList<Integer> itemsToBuy){
+
+        Route finalRoute = new Route(route);
+        // itemToBuy is given
+        // availablePOIs is given
+
+        BigDecimal minCost = BigDecimal.valueOf(Double.MAX_VALUE);//max value acts as infinity
+        Integer candidateNN = null;
+        Integer prevPOI = null;
+        Integer nextPOI = null;
+
+
+        for(int i = 0; i < route.pois.size(); i++){
+            double potentialMinCost = Double.POSITIVE_INFINITY;
+            Integer potentialCandidateNN = null;
+            Integer potentialPrevPOI = null;
+            Integer potentialNextPOI = null;
+
+            if(i == route.pois.size() - 1) {
+
+                for (int j = 0; j < availablePOIs.size(); j++) {
+                    double firstCost = sortedCurrentToNextItemArray[i][availablePOIs.get(j)][1];
+                    double secondCost = endToPOIs[availablePOIs.get(j)];
+                    double combinedNewCost = firstCost + secondCost;
+
+                    if (potentialMinCost > combinedNewCost) {
+                        potentialMinCost = combinedNewCost;
+                        potentialCandidateNN = availablePOIs.get(j);
+                        potentialPrevPOI = i;
+                        potentialNextPOI = -1; // -1 represents end location
+                    }
+
+                }
+
+                // need to consider picking availablePOI from start loc.
+//            }else if(i == 0){
+//
+//                for(int j = 0; j < availablePOIs.size(); j++){
+//                    double firstCost = sortedStartToPOIItemArray[availablePOIs.get(j)][itemsToBuy.get(0)];
+//                    double secondCost = sortedCurrentToNextItemArray[availablePOIs.get(j)][route.pois.get(i+1)][itemsToBuy.get(0)];
+//                    double combinedNewCost = firstCost + secondCost;
+//
+//                    if(potentialMinCost > combinedNewCost){
+//                        potentialMinCost = combinedNewCost;
+//                        potentialCandidateNN = availablePOIs.get(j);
+//                        potentialPrevPOI = i;
+//                        potentialNextPOI = i+1;
+//                    }
+//                }
+//
+//            }else{
+            }else{
+                for(int j = 0; j < availablePOIs.size(); j++){
+
+                    double firstCost = sortedCurrentToNextItemArray[i][availablePOIs.get(j)][1];
+                    double secondCost = sortedCurrentToNextItemArray[availablePOIs.get(j)][route.pois.get(i+1)][1];
+                    double combinedNewCost = firstCost + secondCost;
+
+                    if(potentialMinCost > combinedNewCost){
+                        potentialMinCost = combinedNewCost;
+                        potentialCandidateNN = availablePOIs.get(j);
+                        potentialPrevPOI = i;
+                        potentialNextPOI = i+1;
+                    }
+                }
+            }
+
+            if(minCost.floatValue() > potentialMinCost){
+                minCost = BigDecimal.valueOf(potentialMinCost);
+                candidateNN = potentialCandidateNN;
+                prevPOI = potentialPrevPOI;
+                nextPOI = potentialNextPOI;
+            }
+
+        }
+
+        if(candidateNN != null){
+            int changed = 0;
+            for(int i = 0; i < route.pois.size()-1; i++){
+                if(prevPOI == i && nextPOI == i+1){
+                    finalRoute.totalCost -= finalRoute.costs.get(i);
+                    finalRoute.costs.set(i, minCost.floatValue());
+                    finalRoute.pois.add(i+1, candidateNN);
+                    finalRoute.items.add(i+1, itemsToBuy.get(0));
+                    finalRoute.totalCost += minCost.floatValue();
+                    changed = 1;
+                    System.out.println("----------------------------------------------------------------------------------------------------------------------");
+                    System.out.println("----------------------------------------------------------------------------------------------------------------------");
+                    break;
+                }
+            }
+            if(changed == 0 && prevPOI == route.pois.size()-1 && nextPOI == -1){
+                finalRoute.totalCost -= finalRoute.costs.get( finalRoute.costs.size() - 1 );
+                finalRoute.costs.set( finalRoute.costs.size() - 1 , minCost.floatValue() );
+                finalRoute.items.add(itemsToBuy.get(0));
+                finalRoute.pois.add(candidateNN);
+                finalRoute.totalCost += minCost.floatValue();
+
+            }
+        }else{
+            System.out.println("No candidate found");
+        }
+
+        return finalRoute;
+    }
+
     public static Comparator<Route> idComparator = new Comparator<Route>(){
 
         @Override
@@ -304,16 +422,33 @@ public class Main {
         ArrayList<Integer> itemsToBuy = new ArrayList<Integer>();
 
 //        for (int i = 0;i<1;i++){
-        itemsToBuy.add(10); // creating a shopping list
+        Random rand = new Random(); //instance of random class
+        int upperBound = 999;
+        itemsToBuy.add(rand.nextInt(upperBound)); // creating a shopping list
 //        }
+        // pois: [43, 43, 38, 38, 27]
+        int[] givenPois = new int[]{43, 43, 38, 38, 27};
+        int[] givenItems = new int[]{0, 4, 2, 3, 1};
+        Float[] givenCosts = new Float[]{150.0f, 10.0f, 15300.0f, 0.0f, 1000.0f};
 
+
+
+
+        // items: [0, 4, 2, 3, 1]
         Route route = new Route();
-        for (int i = 0;i<5;i++){
-            route.pois.add(i);
+        for (int i = 0;i<givenPois.length;i++){
+            route.pois.add(givenPois[i]);
         }
-        for (int i = 0;i<5;i++){
-            route.items.add(i);
+        for (int i = 0;i<givenItems.length;i++){
+            route.items.add(givenItems[i]);
         }
+        for (int i = 0;i<givenCosts.length;i++){
+            route.costs.add(givenCosts[i]);
+            route.totalCost += givenCosts[i];
+        }
+        route.latestPoi = route.pois.get(route.pois.size()-1);
+        route.latestItem = route.items.get(route.items.size()-1);
+        route.latestCost = givenCosts[givenCosts.length-1];
 
         long preComputationStartTime = System.currentTimeMillis();
         ArrayList<POI> pois = new ArrayList<POI>();
@@ -353,7 +488,9 @@ public class Main {
                 startToPOIItemArray[i][0][1] = Double.POSITIVE_INFINITY;
 //            }
         }
+//        for (int iter = 0; iter < 100; iter++) {
 
+//            itemsToBuy.set(0, rand.nextInt(upperBound));
         createStart3DArray(startToPOIItemArray, startToPOIs, pois, itemsToBuy, travelWeight, costWeight); // create 3D array containing the combined weight of cost and travel dist from start loc to all pois and items
 
 
@@ -406,7 +543,8 @@ public class Main {
             }
         }
 
-        double [][][] sortedCurrentToNextItemArray = new double [currentToNextItemArray.length][currentToNextItemArray.length][2];
+        double [][][] sortedCurrentToNextItemArray = new double [currentToNextItemArray.length][currentToNextItemArray.length][2]; // we all know that only one item is being bought. so we go from one poi to another and get the cost of buying the item to ge bought.
+        // if we have multiple items to buy, then we should change this implementation
 
         for(int i=0;i<currentToNextItemArray.length;i++){
             for (int j=0;j<currentToNextItemArray[i].length;j++) {
@@ -423,6 +561,10 @@ public class Main {
             });
         }
 
+        ArrayList<Integer> availablePOIs = new ArrayList<>();
+        availablePOIs = getAvailablePOIs(pois, itemsToBuy);
+
+
         long preComputationEndTime = System.currentTimeMillis();
         double preComputationDuration = (double) (preComputationEndTime - preComputationStartTime)/ (double) 1000;
 
@@ -432,29 +574,35 @@ public class Main {
         // in the 3d array, for each POI, find the next POI with the lowest combined weight of cost and travel distance
         // The poi with the lowest
 
-        double [] upperBound = new double[3];
-        upperBound[0] = Float.POSITIVE_INFINITY; // last poi from the sorted array
-        upperBound[1] = sortedStartToPOIItemArray[0][0]; // next poi number
-        upperBound[2] = sortedStartToPOIItemArray[0][1]; // cost
+//        double [] upperBound = new double[3];
+//        upperBound[0] = Float.POSITIVE_INFINITY; // last poi from the sorted array
+//        upperBound[1] = sortedStartToPOIItemArray[0][0]; // next poi number
+//        upperBound[2] = sortedStartToPOIItemArray[0][1]; // cost
+//
+//        for(int i = 0; i < route.pois.size(); i++){
+//            int poi = route.pois.get(i);
+//            if(sortedCurrentToNextItemArray[poi][0][0] != Float.POSITIVE_INFINITY &&
+//                    sortedCurrentToNextItemArray[poi][0][1] != Float.POSITIVE_INFINITY &&
+//                    sortedCurrentToNextItemArray[poi][0][1] < upperBound[2]){
+//                upperBound[0] = poi;
+//                upperBound[1] = sortedCurrentToNextItemArray[poi][0][0];
+//                upperBound[2] = sortedCurrentToNextItemArray[poi][0][1];
+//            }
+//
+//        }
+//
+//        int lastPOIindex = route.pois.lastIndexOf( (int) upperBound[0]);
+//        route.pois.add(lastPOIindex, (int) upperBound[1]);
+//        route.items.add(lastPOIindex, itemsToBuy.get(0)); // need to make sure the original route has multiple duplicate pois for different items bought
 
-        for(int i = 0; i < route.pois.size(); i++){
-            int poi = route.pois.get(i);
-            if(sortedCurrentToNextItemArray[poi][0][0] != Float.POSITIVE_INFINITY &&
-                    sortedCurrentToNextItemArray[poi][0][1] != Float.POSITIVE_INFINITY &&
-                    sortedCurrentToNextItemArray[poi][0][1] < upperBound[2]){
-                upperBound[0] = poi;
-                upperBound[1] = sortedCurrentToNextItemArray[poi][0][0];
-                upperBound[2] = sortedCurrentToNextItemArray[poi][0][1];
-            }
 
-        }
+            Route finalRoute = new Route();
+            finalRoute = computeNewRoute(route, sortedStartToPOIItemArray, sortedCurrentToNextItemArray, endToPOIs, availablePOIs, itemsToBuy);
 
-        int lastPOIindex = route.pois.lastIndexOf( (int) upperBound[0]);
-        route.pois.add(lastPOIindex, (int) upperBound[1]);
-        route.items.add(lastPOIindex, itemsToBuy.get(0)); // need to make sure the original route has multiple duplicate pois for different items bought
-
-
-
+            System.out.println(route.toString());
+            System.out.println(finalRoute.toString());
+            System.out.println("\n");
+//        }
 
 
     }

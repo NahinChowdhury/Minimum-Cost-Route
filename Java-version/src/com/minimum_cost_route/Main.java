@@ -898,29 +898,29 @@ public class Main {
             firstALgAvgDuration += (double) (firstAlgEndTime - firstALgStartTime) / (double) 1000;
             firstAlgAvgTotalCost += firstRoute.totalCost;
 
-//            long secondALgStartTime = System.currentTimeMillis();
-//
-//            Route secondRoute;
-//
-//            secondRoute = findBestRouteContinued(startToPOIItemArray.clone(), currentToNextItemArray.clone(), endToPOIs.clone(), itemsToBuy);
-//            System.out.println("Route: " + secondRoute.toString());
-//
-//
-//            long secondAlgEndTime = System.currentTimeMillis();
-//            System.out.println("First algorithm time: " + (double) (secondAlgEndTime - secondALgStartTime) / (double) 1000);
-//            System.out.println("");
-//            System.out.println("");
-//
-//            secondALgAvgDuration += (double) (secondAlgEndTime - secondALgStartTime) / (double) 1000;
-//            secondAlgAvgTotalCost += secondRoute.totalCost;
+            long secondALgStartTime = System.currentTimeMillis();
+
+            Route secondRoute;
+
+            secondRoute = findBestRouteContinued(startToPOIItemArray.clone(), currentToNextItemArray.clone(), endToPOIs.clone(), itemsToBuy);
+            System.out.println("Route: " + secondRoute.toString());
+
+
+            long secondAlgEndTime = System.currentTimeMillis();
+            System.out.println("Second algorithm time: " + (double) (secondAlgEndTime - secondALgStartTime) / (double) 1000);
+            System.out.println("");
+            System.out.println("");
+
+            secondALgAvgDuration += (double) (secondAlgEndTime - secondALgStartTime) / (double) 1000;
+            secondAlgAvgTotalCost += secondRoute.totalCost;
 
         }
 
         System.out.println("Average first algorithm time: " + (double) firstALgAvgDuration/ (double) n);
-//        System.out.println("Average second algorithm time: " + (double) secondALgAvgDuration/ (double) n);
+        System.out.println("Average second algorithm time: " + (double) secondALgAvgDuration/ (double) n);
 
         System.out.println("Average first algorithm total cost: " + (double) firstAlgAvgTotalCost/ (double) n);
-//        System.out.println("Average second algorithm total cost: " + (double) secondAlgAvgTotalCost/ (double) n);
+        System.out.println("Average second algorithm total cost: " + (double) secondAlgAvgTotalCost/ (double) n);
 
     }
 }
